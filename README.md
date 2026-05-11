@@ -1,12 +1,13 @@
 # Clustering Benchmark Suite
 
-Benchmarking code for comparing clustering algorithms across **R** and **Python** (CPU via `scikit-learn`, GPU via `cuML`). This accompanies the clustering experiments section of the review paper (`main.tex`).
+Benchmarking code for comparing clustering algorithms across **R** and **Python** (CPU via `scikit-learn`, GPU via `cuML`).
 
 ## Methods
 
 | Method | R Implementation | Python (CPU) | Python (GPU) |
 |--------|-----------------|-------------|-------------|
 | K-Means | `stats::kmeans` | `sklearn.cluster.KMeans` | `cuml.cluster.KMeans` |
+| GMM | `ClusterR::GMM` | `sklearn.mixture.GaussianMixture` | — |
 | HDBSCAN | `dbscan::hdbscan` | `sklearn.cluster.HDBSCAN` | `cuml.cluster.HDBSCAN` |
 | DBSCAN | `dbscan::dbscan` | `sklearn.cluster.DBSCAN` | `cuml.cluster.DBSCAN` |
 | HC | `stats::hclust` | `sklearn.cluster.AgglomerativeClustering` | `cuml.cluster.AgglomerativeClustering` |
@@ -28,14 +29,16 @@ wire/
 │   ├── replicate_1.npz
 │   └── ...
 ├── python_kmeans.py          # Python K-Means benchmark (sklearn + cuML)
-├── python_hdbscan.py         # Python HDBSCAN benchmark
-├── python_dbscan.py          # Python DBSCAN benchmark
-├── python_hc.py              # Python HC benchmark
+├── python_gmm.py             # Python GMM benchmark (sklearn only)
+├── python_hdbscan.py         # Python HDBSCAN benchmark (sklearn + cuML)
+├── python_dbscan.py          # Python DBSCAN benchmark (sklearn + cuML)
+├── python_hc.py              # Python HC benchmark (sklearn + cuML)
 ├── R_kmeans.R                # R K-Means benchmark
+├── R_gmm.R                   # R GMM benchmark
 ├── R_hdbscan.R               # R HDBSCAN benchmark
 ├── R_dbscan.R                # R DBSCAN benchmark
 ├── R_hc.R                    # R HC benchmark
-├── main.tex                  # Review paper
+├── summarize_results.ipynb   # Summary notebook (mean, std, LaTeX export)
 └── README.md
 ```
 
@@ -57,15 +60,19 @@ Requires an NVIDIA GPU with RAPIDS/cuML installed.
 
 ```bash
 python python_kmeans.py
+python python_gmm.py
 python python_hdbscan.py
 python python_dbscan.py
 python python_hc.py
 ```
 
+> **Note:** `python_gmm.py` is CPU-only (sklearn) since cuML does not support GMM.
+
 ### 3. Run R Benchmarks
 
 ```r
 source("R_kmeans.R")
+source("R_gmm.R")
 source("R_hdbscan.R")
 source("R_dbscan.R")
 source("R_hc.R")
@@ -78,13 +85,23 @@ Each script saves incremental results to a CSV file after every replicate:
 | Script | Output File |
 |--------|------------|
 | `python_kmeans.py` | `python_kmeans_results.csv` |
+| `python_gmm.py` | `python_gmm_results.csv` |
 | `python_hdbscan.py` | `python_hdbscan_results.csv` |
 | `python_dbscan.py` | `python_dbscan_results.csv` |
 | `python_hc.py` | `python_hc_results.csv` |
 | `R_kmeans.R` | `R_kmeans_results.csv` |
+| `R_gmm.R` | `R_gmm_results.csv` |
 | `R_hdbscan.R` | `R_hdbscan_results.csv` |
 | `R_dbscan.R` | `R_dbscan_results.csv` |
 | `R_hc.R` | `R_hc_results.csv` |
+
+### 5. Summarize Results
+
+After all benchmarks complete, open `summarize_results.ipynb` to:
+- Compute **mean (std)** across replicates for each method and implementation
+- Generate a **GPU speedup** table
+- Export a **LaTeX table** for paper inclusion
+- Save a consolidated `summary_results.csv`
 
 ## Data Generating Process
 
@@ -104,11 +121,12 @@ Synthetic data is generated using `sklearn.datasets.make_blobs` with:
 - `mclust` — `adjustedRandIndex()`
 - `aricode` — `NMI()`
 - `dbscan` — DBSCAN and HDBSCAN (used in `R_dbscan.R` and `R_hdbscan.R`)
+- `ClusterR` — fast GMM (used in `R_gmm.R`)
 - `jsonlite` — loading `config.json`
 
 Install R packages:
 ```r
-install.packages(c("reticulate", "mclust", "aricode", "dbscan", "jsonlite"))
+install.packages(c("reticulate", "mclust", "aricode", "dbscan", "ClusterR", "jsonlite"))
 ```
 
 ## Scalability Notes
