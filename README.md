@@ -10,7 +10,7 @@ Benchmarking code for comparing clustering algorithms across **R** and **Python*
 | GMM | `ClusterR::GMM` | `sklearn.mixture.GaussianMixture` | — |
 | HDBSCAN | `dbscan::hdbscan` | `sklearn.cluster.HDBSCAN` | `cuml.cluster.HDBSCAN` |
 | DBSCAN | `dbscan::dbscan` | `sklearn.cluster.DBSCAN` | `cuml.cluster.DBSCAN` |
-| HC | `stats::hclust` | `sklearn.cluster.AgglomerativeClustering` | `cuml.cluster.AgglomerativeClustering` |
+| Hierarchical Clustering | `stats::hclust` | `sklearn.cluster.AgglomerativeClustering` | `cuml.cluster.AgglomerativeClustering` |
 
 ## Metrics
 
