@@ -7,7 +7,7 @@ Benchmarking code for comparing clustering algorithms across **R** and **Python*
 | Method | R Implementation | Python (CPU) | Python (GPU) |
 |--------|-----------------|-------------|-------------|
 | K-Means | `stats::kmeans` | `sklearn.cluster.KMeans` | `cuml.cluster.KMeans` |
-| GMM | `ClusterR::GMM` | `sklearn.mixture.GaussianMixture` | — |
+| GMM | `mclust::Mclust` | `sklearn.mixture.GaussianMixture` | — |
 | HDBSCAN | `dbscan::hdbscan` | `sklearn.cluster.HDBSCAN` | `cuml.cluster.HDBSCAN` |
 | DBSCAN | `dbscan::dbscan` | `sklearn.cluster.DBSCAN` | `cuml.cluster.DBSCAN` |
 | Hierarchical Clustering | `stats::hclust` | `sklearn.cluster.AgglomerativeClustering` | `cuml.cluster.AgglomerativeClustering` |
@@ -121,12 +121,12 @@ Synthetic data is generated using `sklearn.datasets.make_blobs` with:
 - `mclust` — `adjustedRandIndex()`
 - `aricode` — `NMI()`
 - `dbscan` — DBSCAN and HDBSCAN (used in `R_dbscan.R` and `R_hdbscan.R`)
-- `ClusterR` — fast GMM (used in `R_gmm.R`)
+- `mclust` — GMM via `Mclust()` and `adjustedRandIndex()` (used in all R scripts)
 - `jsonlite` — loading `config.json`
 
 Install R packages:
 ```r
-install.packages(c("reticulate", "mclust", "aricode", "dbscan", "ClusterR", "jsonlite"))
+install.packages(c("reticulate", "mclust", "aricode", "dbscan", "jsonlite"))
 ```
 
 ## Scalability Notes
